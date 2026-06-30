@@ -152,3 +152,18 @@ export interface TailorResult {
   costUSD: number;
   costAED: number;
 }
+
+// A saved application run (Phase 3 history) — re-downloadable so a role is
+// never re-tailored (re-paid for).
+export interface HistoryEntry {
+  id: string;
+  createdAt: string; // ISO
+  company: string;
+  role: string;
+  model: "sonnet" | "opus";
+  costUSD: number;
+  costAED: number;
+  cv: CVDocument;
+  cover: CoverLetter;
+  recruiterNote: RecruiterNote;
+}

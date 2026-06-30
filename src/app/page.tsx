@@ -75,7 +75,10 @@ export default function Home() {
     <>
       <div className="appbar">
         <span className="brand">ApplyKit</span>
-        <Link href="/bank">Edit bank →</Link>
+        <span style={{ display: "flex", gap: 14 }}>
+          <Link href="/history">History</Link>
+          <Link href="/bank">Bank</Link>
+        </span>
       </div>
       <div className="wrap">
         <div className="card">
@@ -104,6 +107,18 @@ export default function Home() {
 
         <DownloadGroup doc="cv" title="CV (from bank)" />
         <DownloadGroup doc="cover" title="Cover letter (sample)" />
+
+        <div style={{ textAlign: "center", marginTop: 8 }}>
+          <button
+            className="btn btn-ghost"
+            onClick={async () => {
+              await fetch("/api/login", { method: "DELETE" });
+              window.location.href = "/login";
+            }}
+          >
+            Log out
+          </button>
+        </div>
       </div>
       {toast && <div className="toast">{toast}</div>}
     </>

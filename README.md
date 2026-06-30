@@ -28,9 +28,31 @@ description, in my established format, downloadable as PDF and Word. Phone-first
 
 - **Phase 1 (done)** — Experience bank (seeded, editable in a mobile UI) +
   document generator producing one-page CV & cover letter as PDF + Word.
-- **Phase 2** — JD intake + Anthropic tailoring call returning structured JSON.
-- **Phase 3** — Vercel deploy, password gate, application history.
-- **Phase 4** — Live-project idea, hiring-manager email guess, cost meter, Opus toggle.
+- **Phase 2 (done)** — JD intake (paste + URL readability fetch with LinkedIn
+  fallback) + one Anthropic tailoring call (Sonnet 4.6 default, Opus 4.8
+  toggle) returning structured JSON → tailored docs + recruiter's-eye note +
+  per-run cost meter.
+- **Phase 3 (done, pending deploy)** — Single-password gate (middleware),
+  application history (Supabase + local fallback), re-downloadable runs,
+  month-to-date budget meter. Deploy to Vercel is the collaborative step below.
+- **Phase 4** — Live-project idea, hiring-manager email guess, persistent cost
+  meter polish.
+
+## Deploy to Vercel (Phase 3)
+
+1. **Supabase** — create a free project, open the SQL editor, and run
+   `supabase/schema.sql`. From Project Settings → API, copy the **Project URL**
+   and the **service_role** key (server-side only — never the anon key here).
+2. **Vercel** — import this GitHub repo as a new project (framework auto-detected
+   as Next.js). Add these Environment Variables (Production + Preview):
+   - `APP_PASSWORD` — the single password to enter the app.
+   - `ANTHROPIC_API_KEY` — your Anthropic key (server-side only).
+   - `SUPABASE_URL` — the Supabase project URL.
+   - `SUPABASE_SERVICE_ROLE_KEY` — the service_role key.
+3. **Deploy.** Hosting stays on the free (Hobby) tier — cost = Anthropic API
+   only. Note the 60s function limit: Sonnet runs comfortably; a heavy Opus pass
+   is the one thing that could approach it.
+4. Open the deployment URL on your phone, log in with `APP_PASSWORD`, and tailor.
 
 ## Local dev
 

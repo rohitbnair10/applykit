@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import type { ExperienceBank } from "./types";
+import type { ExperienceBank, HistoryEntry } from "./types";
 import { SEED_BANK } from "./seed";
 
 // ---------------------------------------------------------------------------
@@ -16,6 +16,7 @@ import { SEED_BANK } from "./seed";
 // ---------------------------------------------------------------------------
 
 const LOCAL_FILE = path.join(process.cwd(), ".data", "bank.json");
+const LOCAL_HISTORY = path.join(process.cwd(), ".data", "history.json");
 const BANK_ROW_ID = "singleton";
 
 function getSupabase(): SupabaseClient | null {
@@ -69,4 +70,85 @@ export async function saveBank(bank: ExperienceBank): Promise<void> {
 
 export function storageMode(): "supabase" | "local" {
   return getSupabase() ? "supabase" : "local";
+}
+
+// ---------------------------------------------------------------------------
+// Application history
+// ---------------------------------------------------------------------------
+
+async function readLocalHistory(): Promise<HistoryEntry[]> {
+  try {
+    const raw = await fs.readFile(LOCAL_HISTORY, "utf8");
+    return JSON.parse(raw) as HistoryEntry[];
+  } catch {
+    return [];
+  }
+}
+
+async function writeLocalHistory(rows: HistoryEntry[]): Promise<void> {
+  await fs.mkdir(path.dirname(LOCAL_HISTORY), { recursive: true });
+  await fs.writeFile(LOCAL_HISTORY, JSON.stringify(rows, null, 2), "utf8");
+}
+
+export async function saveRun(entry: HistoryEntry): Promise<void> {
+  const supabase = getSupabase();
+  if (!supabase) {
+    const rows = await readLocalHistory();
+    rows.unshift(entry);
+    return writeLocalHistory(rows);
+  }
+  const { error } = await supabase.from("history").insert({
+    id: entry.id,
+    created_at: entry.createdAt,
+    company: entry.company,
+    role: entry.role,
+    model: entry.model,
+    cost_usd: entry.costUSD,
+    cost_aed: entry.costAED,
+    cv: entry.cv,
+    cover: entry.cover,
+    recruiter_note: entry.recruiterNote,
+  });
+  if (error) throw new Error(`Supabase saveRun failed: ${error.message}`);
+}
+
+function rowToEntry(r: Record<string, unknown>): HistoryEntry {
+  return {
+    id: r.id as string,
+    createdAt: r.created_at as string,
+    company: (r.company as string) ?? "",
+    role: (r.role as string) ?? "",
+    model: r.model as "sonnet" | "opus",
+    costUSD: Number(r.cost_usd ?? 0),
+    costAED: Number(r.cost_aed ?? 0),
+    cv: r.cv as HistoryEntry["cv"],
+    cover: r.cover as HistoryEntry["cover"],
+    recruiterNote: r.recruiter_note as HistoryEntry["recruiterNote"],
+  };
+}
+
+export async function listRuns(): Promise<HistoryEntry[]> {
+  const supabase = getSupabase();
+  if (!supabase) return readLocalHistory();
+  const { data, error } = await supabase
+    .from("history")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(`Supabase listRuns failed: ${error.message}`);
+  return (data ?? []).map(rowToEntry);
+}
+
+export async function getRun(id: string): Promise<HistoryEntry | null> {
+  const supabase = getSupabase();
+  if (!supabase) {
+    const rows = await readLocalHistory();
+    return rows.find((r) => r.id === id) ?? null;
+  }
+  const { data, error } = await supabase
+    .from("history")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(`Supabase getRun failed: ${error.message}`);
+  return data ? rowToEntry(data) : null;
 }
