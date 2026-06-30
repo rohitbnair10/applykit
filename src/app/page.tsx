@@ -79,10 +79,21 @@ export default function Home() {
       </div>
       <div className="wrap">
         <div className="card">
-          <h2>Phase 1 — Format preview</h2>
+          <h2>Tailor to a job</h2>
+          <p className="sub" style={{ marginBottom: 12 }}>
+            Paste a job description and get a one-page CV + cover letter tailored to
+            it, in your format, with a recruiter&apos;s-eye note.
+          </p>
+          <Link href="/tailor" className="btn btn-primary btn-block">
+            Start a tailored application →
+          </Link>
+        </div>
+
+        <div className="card">
+          <h2>Format preview (no AI)</h2>
           <p className="sub" style={{ marginBottom: 8 }}>
-            Generates straight from your experience bank (no AI yet). Use this to
-            confirm the one-page format before we add JD tailoring.
+            Generate straight from your experience bank to check the one-page
+            format.
           </p>
           {storage && (
             <span className="pill">
@@ -91,15 +102,8 @@ export default function Home() {
           )}
         </div>
 
-        <DownloadGroup doc="cv" title="CV" />
+        <DownloadGroup doc="cv" title="CV (from bank)" />
         <DownloadGroup doc="cover" title="Cover letter (sample)" />
-
-        <div className="card">
-          <p className="muted" style={{ margin: 0 }}>
-            Tip: the cover letter here is a generic sample to show formatting. In
-            Phase 2 it becomes tailored to a pasted job description.
-          </p>
-        </div>
       </div>
       {toast && <div className="toast">{toast}</div>}
     </>

@@ -10,6 +10,7 @@
     "sample": "tsx scripts/sample.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.108.0",
     "@sparticuz/chromium": "^131.0.0",
     "@supabase/supabase-js": "^2.45.4",
     "docx": "^9.0.2",

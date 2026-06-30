@@ -134,3 +134,29 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); bo
   background: linear-gradient(180deg, rgba(245,247,250,0) 0%, var(--bg) 40%);
   padding: 14px 0 8px;
 }
+
+/* Toggle switch */
+.switch { position: relative; display: inline-block; width: 52px; height: 30px; flex: 0 0 auto; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch .slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #cdd6e2;
+  border-radius: 999px;
+  transition: background 0.15s;
+}
+.switch .slider::before {
+  content: "";
+  position: absolute;
+  height: 24px;
+  width: 24px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.switch input:checked + .slider { background: var(--navy); }
+.switch input:checked + .slider::before { transform: translateX(22px); }

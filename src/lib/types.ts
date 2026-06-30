@@ -109,3 +109,46 @@ export interface CoverLetter {
   signoff: string; // e.g. "Sincerely,"
   signatureName: string;
 }
+
+// ---------------------------------------------------------------------------
+// Phase 2 — tailoring engine output.
+// ---------------------------------------------------------------------------
+
+// The critical "recruiter's-eye" assessment the model returns alongside docs.
+export interface RecruiterNote {
+  summary: string; // 1-2 sentence verdict on shortlist-fit
+  gaps: string[]; // missing skills/experience the JD asks for
+  framingMismatches: string[]; // where my framing doesn't mirror the JD
+  seniorityFlags: string[]; // e.g. "JD wants 8-10 yrs; I have 4+"
+}
+
+// The raw structured JSON we ask the model to return. Header, side projects,
+// and education are taken from the bank, not the model.
+export interface TailorModelOutput {
+  summary: string;
+  cvRoles: {
+    company: string;
+    title: string;
+    location: string;
+    dates: string;
+    bullets: string[];
+  }[];
+  skills: { group: string; items: string[] }[];
+  coverLetter: {
+    greeting: string;
+    paragraphs: string[];
+    signoff: string;
+  };
+  recruiterNote: RecruiterNote;
+}
+
+// What the tailor endpoint returns to the client and stores in history.
+export interface TailorResult {
+  cv: CVDocument;
+  cover: CoverLetter;
+  recruiterNote: RecruiterNote;
+  model: "sonnet" | "opus";
+  usage: { inputTokens: number; outputTokens: number };
+  costUSD: number;
+  costAED: number;
+}
